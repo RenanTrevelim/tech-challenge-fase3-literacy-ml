@@ -1,6 +1,6 @@
-# Data — Arquitetura Medalhão
+# Data
 
-Esta pasta contém os dados processados do projeto **Tech Challenge — Fase 3**, organizados segundo a arquitetura Medalhão:
+Esta pasta concentra os datasets utilizados no desenvolvimento do **Tech Challenge — Fase 3**, organizados em três camadas:
 
 ```text
 data/
@@ -9,193 +9,94 @@ data/
 └── gold/
 ```
 
-Os arquivos originais utilizados como fonte não são mantidos nesta pasta. Eles são utilizados apenas no processo de ingestão para geração da camada Bronze.
+A separação entre as camadas facilita a organização dos dados e deixa claro quais arquivos representam a entrada, o tratamento intermediário e as bases finais utilizadas nas análises.
 
 ---
 
-## Arquitetura dos Dados
+## Bronze
 
-O fluxo adotado no projeto é:
+A camada Bronze contém os dados em formato Parquet, preservando a estrutura original utilizada no projeto.
+
+Principais conjuntos de dados:
+
+* dados de alunos;
+* indicadores de alfabetização por município;
+* indicadores de alfabetização por UF;
+* metas municipais de alfabetização;
+* metas estaduais de alfabetização;
+* metas nacionais de alfabetização.
+
+Essa camada funciona como ponto de partida para as transformações realizadas nas etapas seguintes.
+
+---
+
+## Silver
+
+A camada Silver contém os dados tratados, padronizados e organizados para consumo analítico.
+
+Arquivos principais:
 
 ```text
-Dados de origem
-      ↓
-Bronze
-      ↓
-Silver
-      ↓
-Gold
-      ↓
-EDA
-      ↓
-Machine Learning
-      ↓
-Interpretabilidade e Insights
+alunos.parquet
+municipio.parquet
 ```
-
-Cada camada possui uma responsabilidade específica dentro do pipeline.
-
----
-
-## `bronze/`
-
-A camada Bronze representa a primeira etapa de ingestão dos dados.
-
-Os arquivos provenientes das fontes originais são convertidos para o formato Parquet, preservando o conteúdo o mais próximo possível da origem.
-
-Principais características:
-
-* preservação da granularidade original;
-* conversão dos arquivos para Parquet;
-* ausência de regras de negócio;
-* ausência de imputação de valores faltantes;
-* ausência de transformações analíticas.
-
-Arquivos utilizados:
-
-```text
-Alunos.parquet
-
-br_inep_avaliacao_alfabetizacao_municipio.parquet
-br_inep_avaliacao_alfabetizacao_uf.parquet
-
-br_inep_avaliacao_alfabetizacao_meta_alfabetizacao_municipio.parquet
-br_inep_avaliacao_alfabetizacao_meta_alfabetizacao_uf.parquet
-br_inep_avaliacao_alfabetizacao_meta_alfabetizacao_brasil.parquet
-```
-
-A camada Bronze funciona como ponto de entrada reproduzível do pipeline.
-
----
-
-## `silver/`
-
-A camada Silver contém os dados tratados, padronizados e integrados.
-
-Nesta etapa são aplicadas transformações de qualidade e preparação necessárias para consumo analítico.
-
-Principais transformações:
-
-* padronização dos nomes das colunas;
-* padronização de identificadores;
-* conversão de tipos;
-* limpeza de campos textuais;
-* remoção de duplicatas exatas;
-* padronização da rede de ensino;
-* tratamento de códigos municipais;
-* integração entre indicadores e metas.
 
 ### `alunos.parquet`
 
-Dataset em nível individual.
+Mantém os dados em nível individual, com informações relacionadas a aluno, escola, município, rede de ensino, presença, alfabetização e proficiência.
 
 Granularidade:
 
 ```text
 1 linha = 1 aluno por ano
 ```
-
-Contém informações como:
-
-* ano;
-* município;
-* escola;
-* aluno;
-* caderno;
-* série;
-* rede de ensino;
-* presença;
-* preenchimento do caderno;
-* alfabetização;
-* proficiência;
-* peso do aluno.
-
-A granularidade individual é preservada para permitir análises e modelagem supervisionada nas etapas seguintes.
 
 ### `municipio.parquet`
 
-Dataset analítico em nível municipal.
+Contém os indicadores educacionais consolidados em nível municipal, incluindo informações de alfabetização e metas.
 
-Granularidade principal:
-
-```text
-município × ano × rede
-```
-
-Contém a integração entre:
-
-* indicador de alfabetização;
-* métricas educacionais;
-* metas municipais;
-* metas estaduais;
-* metas nacionais.
-
-Os joins foram validados para evitar multiplicação indevida de registros.
+Essa base é utilizada como apoio para análises territoriais e para enriquecimento das bases finais.
 
 ---
 
-## `gold/`
+## Gold
 
-A camada Gold contém os datasets preparados para consumo analítico.
+A camada Gold contém os datasets preparados para as etapas de **Análise Exploratória de Dados e Machine Learning**.
 
-Nesta etapa, os dados da Silver são enriquecidos e organizados de acordo com os objetivos da Fase 3.
+Arquivos principais:
+
+```text
+gold_alunos.parquet
+gold_municipal.parquet
+```
 
 ### `gold_alunos.parquet`
 
-Dataset individual utilizado como principal base para:
+Base individual utilizada para:
 
-* análise exploratória;
-* análise de alfabetização;
-* análise de presença;
-* preparação da modelagem supervisionada.
+* análise do comportamento dos alunos;
+* investigação da variável de alfabetização;
+* preparação dos modelos supervisionados;
+* avaliação de possíveis variáveis explicativas.
 
-Granularidade:
-
-```text
-1 linha = 1 aluno por ano
-```
-
-A Gold preserva variáveis como:
-
-* alfabetização;
-* presença;
-* proficiência;
-* contexto escolar;
-* município;
-* rede de ensino;
-* informações contextuais adicionadas a partir da camada municipal.
-
-Nesta etapa, variáveis potencialmente associadas a `data leakage` ainda são mantidas para análise.
-
-A decisão final sobre filtros e seleção de features será realizada durante a EDA e a modelagem.
+A base mantém variáveis relevantes para análise, enquanto decisões como seleção de features, tratamento de valores faltantes e prevenção de data leakage são realizadas posteriormente durante a etapa de modelagem.
 
 ### `gold_municipal.parquet`
 
-Dataset voltado para análises agregadas e inteligência analítica.
-
-Granularidade:
-
-```text
-município × ano × rede
-```
-
-Pode ser utilizado para:
+Base analítica voltada para:
 
 * análise territorial;
-* comparação de indicadores;
-* acompanhamento de metas;
-* identificação de municípios vulneráveis;
-* rankings;
-* mapas;
-* geração de insights para políticas públicas.
-
-Também contém variáveis analíticas derivadas relacionadas ao atingimento das metas.
+* comparação entre municípios;
+* acompanhamento de indicadores;
+* análise de metas educacionais;
+* identificação de regiões com maior vulnerabilidade;
+* geração de insights para apoio à tomada de decisão.
 
 ---
 
-## Volume Atual das Camadas
+## Estrutura Atual
 
-Após o processamento:
+As principais bases finais possuem os seguintes volumes:
 
 ```text
 Silver Alunos
@@ -215,117 +116,30 @@ Gold Municipal
 51 colunas
 ```
 
-As tabelas finais não apresentaram duplicatas exatas após o processamento.
-
 ---
 
-## Decisões de Modelagem
-
-Algumas decisões são propositalmente deixadas para as etapas de EDA e Machine Learning.
-
-Entre elas:
-
-* utilização ou não de alunos ausentes;
-* uso da variável `presenca`;
-* utilização ou exclusão da variável `proficiencia`;
-* tratamento de valores faltantes;
-* seleção das features;
-* encoding de variáveis categóricas;
-* normalização;
-* definição de treino, validação e teste.
-
-Essa abordagem evita antecipar decisões de modelagem durante a engenharia de dados.
-
----
-
-## Data Leakage
-
-O projeto considera explicitamente o risco de `data leakage`.
-
-Variáveis que possuem relação direta com a variável alvo não devem ser automaticamente utilizadas como features.
-
-Um exemplo relevante é:
+## Fluxo dos Dados
 
 ```text
-proficiencia
-```
-
-Como a classificação de alfabetização pode estar diretamente relacionada à proficiência, essa variável será avaliada durante a EDA antes da modelagem.
-
-A Gold preserva essa informação para permitir análise e auditoria.
-
----
-
-## Reprodutibilidade
-
-A arquitetura permite reconstruir os dados seguindo o fluxo:
-
-```text
-Dados de origem
-      ↓
 Bronze
-      ↓
+   ↓
 Silver
-      ↓
+   ↓
 Gold
+   ↓
+EDA
+   ↓
+Machine Learning
+   ↓
+Avaliação e Interpretabilidade
 ```
 
-Essa separação facilita:
-
-* rastreabilidade;
-* manutenção;
-* reprocessamento;
-* validação das transformações;
-* reprodutibilidade analítica.
+A camada Gold é utilizada como principal fonte de dados para as análises e modelos desenvolvidos na Fase 3.
 
 ---
 
-## Versionamento dos Dados
+## Observação
 
-Os arquivos originais não são mantidos no repositório.
+Os dados originais utilizados para geração da camada Bronze não são mantidos neste diretório.
 
-Dependendo do tamanho dos datasets, também pode ser interessante excluir algumas camadas do Git utilizando `.gitignore`.
-
-Exemplo:
-
-```gitignore
-data/bronze/
-data/silver/
-data/gold/
-```
-
-Caso seja necessário disponibilizar exemplos no repositório, pode ser criada uma pasta:
-
-```text
-data/sample/
-```
-
-contendo apenas pequenas amostras dos datasets.
-
----
-
-## Próximas Etapas
-
-Com a camada Gold finalizada, o projeto segue para:
-
-```text
-Gold
- ↓
-Análise Exploratória de Dados
- ↓
-Definição de hipóteses
- ↓
-Seleção de features
- ↓
-Pipeline de Machine Learning
- ↓
-Treinamento e validação
- ↓
-Avaliação dos modelos
- ↓
-Interpretabilidade
- ↓
-Insights para tomada de decisão
-```
-
-A camada Gold será utilizada como principal fonte de dados para as etapas analíticas e preditivas da Fase 3.
+A pasta `data/` contém apenas os datasets necessários para dar continuidade às etapas analíticas do projeto.
