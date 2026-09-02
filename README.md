@@ -434,9 +434,6 @@ assumindo como trade-off uma redução na identificação da classe alfabetizada
 
 A decisão foi tomada considerando o modelo como ferramenta de **triagem**, onde identificar alunos potencialmente em risco possui maior prioridade.
 
-<img width="1027" height="495" alt="image" src="https://github.com/user-attachments/assets/9fe660d3-ebdd-4122-859a-2262fc14e122" />
-
-
 ---
 
 # Validação cruzada
@@ -481,6 +478,8 @@ O modelo identificou corretamente:
 correspondendo a aproximadamente **78% de Recall da classe prioritária**.
 
 O resultado está alinhado ao objetivo de aumentar a sensibilidade para alunos potencialmente não alfabetizados.
+
+<img width="1027" height="495" alt="image" src="https://github.com/user-attachments/assets/9fe660d3-ebdd-4122-859a-2262fc14e122" />
 
 ---
 
