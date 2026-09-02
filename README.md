@@ -4,7 +4,7 @@ Projeto de Ciência de Dados desenvolvido para o **Tech Challenge — Fase 3**, 
 
 A solução utiliza dados provenientes da **camada Gold construída na Fase 2**, enriquecidos com informações territoriais, populacionais, socioeconômicas e educacionais.
 
-O projeto contempla desde a preparação e análise dos dados até a construção, validação e interpretação do modelo, finalizando com uma aplicação prática das probabilidades para **priorização de alunos, municípios e regiões**.
+O projeto contempla **preparação e enriquecimento dos dados, análise exploratória, modelagem supervisionada, otimização de hiperparâmetros, ensembles, validação, interpretabilidade, geração de scores de risco e uma aplicação interativa em Streamlit** para consumo das previsões.
 
 ---
 
@@ -14,7 +14,7 @@ O projeto busca responder principalmente à seguinte questão:
 
 > **Quais alunos apresentam maior risco estimado de não alfabetização e como essas informações podem apoiar ações educacionais?**
 
-Para isso, foi desenvolvido um problema de classificação supervisionada:
+O problema foi estruturado como uma classificação supervisionada:
 
 ```text
 0 → Não alfabetizado
@@ -23,7 +23,7 @@ Para isso, foi desenvolvido um problema de classificação supervisionada:
 
 Como o principal objetivo é apoiar a identificação de alunos potencialmente não alfabetizados, a **classe 0** foi definida como prioritária durante a avaliação dos modelos.
 
-A solução foi estruturada para gerar informações em três níveis:
+A solução permite analisar os resultados em diferentes níveis:
 
 ```text
 Aluno
@@ -33,7 +33,7 @@ Município
 Região
 ```
 
-O modelo deve ser interpretado como uma ferramenta de **triagem e apoio à decisão**, e não como diagnóstico pedagógico definitivo.
+O modelo deve ser utilizado como uma ferramenta de **triagem e apoio à decisão**, e não como diagnóstico pedagógico definitivo.
 
 ---
 
@@ -42,31 +42,30 @@ O modelo deve ser interpretado como uma ferramenta de **triagem e apoio à decis
 Os principais objetivos do projeto são:
 
 - utilizar a camada Gold construída na Fase 2;
-- integrar e enriquecer dados educacionais com informações externas;
-- analisar fatores associados à alfabetização;
-- investigar padrões territoriais e socioeconômicos;
-- identificar possíveis fontes de data leakage;
-- construir um pipeline completo de Machine Learning;
+- enriquecer os dados com informações externas oficiais;
+- investigar fatores associados à alfabetização;
+- analisar padrões territoriais e socioeconômicos;
+- identificar e remover possíveis fontes de data leakage;
+- construir um pipeline completo e reprodutível de Machine Learning;
 - comparar diferentes algoritmos de classificação;
 - otimizar os modelos mais promissores;
 - avaliar estratégias de ensemble;
 - validar estabilidade e generalização;
 - interpretar as previsões com Feature Importance e SHAP;
 - priorizar a identificação de alunos não alfabetizados;
-- transformar as probabilidades em informações úteis para apoio à decisão.
+- transformar probabilidades em scores de risco;
+- disponibilizar os resultados em uma aplicação Streamlit interativa.
 
 ---
 
 # Dados utilizados
 
-A base analítica foi construída a partir da integração dos dados da camada **Gold** da Fase 2.
+A base analítica foi construída a partir da integração dos dados da camada **Gold** produzida na Fase 2.
 
-Posteriormente, o dataset foi enriquecido com informações externas oficiais para ampliar o contexto disponível durante a análise e a modelagem.
+Posteriormente, o dataset foi enriquecido com informações externas para ampliar a representação do contexto territorial, econômico e educacional dos alunos.
 
-Foram utilizadas informações relacionadas a:
+Foram incorporadas informações relacionadas a:
 
-- Indicador Criança Alfabetizada;
-- informações municipais;
 - Unidade Federativa e região;
 - população;
 - área territorial;
@@ -74,8 +73,10 @@ Foram utilizadas informações relacionadas a:
 - PIB per capita;
 - renda domiciliar per capita mediana;
 - rede de ensino;
+- quantidade de escolas;
 - infraestrutura escolar;
 - acesso à internet;
+- internet voltada à aprendizagem;
 - biblioteca e sala de leitura;
 - água potável e esgotamento sanitário;
 - acessibilidade;
@@ -90,15 +91,15 @@ Foram utilizadas informações relacionadas a:
 - **INEP**
 - **Censo Escolar**
 
-Os dados do Censo Escolar foram agregados por contexto de:
+Os dados do Censo Escolar foram agregados no contexto:
 
 ```text
 município + ano + rede
 ```
 
-permitindo incorporar informações educacionais complementares sem perda dos registros individuais dos alunos.
+permitindo incorporar informações educacionais complementares à base individual.
 
-> Os indicadores agregados representam o contexto educacional do município, ano e rede, não necessariamente a escola específica frequentada pelo aluno.
+> Os indicadores agregados representam o contexto educacional do município, ano e rede e não necessariamente a escola específica frequentada pelo aluno.
 
 ---
 
@@ -132,23 +133,30 @@ Otimização de hiperparâmetros
         ↓
 Voting / Stacking
         ↓
-Seleção do Random Forest
+Random Forest final
         ↓
 Ajuste de threshold
         ↓
 Validação cruzada
         ↓
-Avaliação final
+Avaliação no conjunto de teste
         ↓
 Feature Importance + SHAP
         ↓
 Learning Curve
         ↓
-Score de risco
+Pipeline serializado
         ↓
-Priorização de alunos e territórios
-        ↓
-Pipeline final
+Aplicação Streamlit
+        │
+        ├── Upload CSV / Parquet
+        ├── Inferência
+        ├── Score de risco
+        ├── Priorização
+        ├── Filtros territoriais
+        ├── Análise municipal
+        ├── Análise regional
+        └── Exportação dos resultados
 ```
 
 ---
@@ -160,8 +168,9 @@ tech-challenge-fase3-literacy-ml/
 │
 ├── data/
 │   ├── external/
+│   ├── silver/
 │   ├── gold/
-│   └── silver/
+│   └── app/
 │
 ├── models/
 │   └── modelo_final_random_forest.pkl
@@ -171,6 +180,11 @@ tech-challenge-fase3-literacy-ml/
 │   ├── 01_enriquecimento_dados_externos.ipynb
 │   ├── 02_analise_exploratoria.ipynb
 │   └── 03_modelos_machine_learning.ipynb
+│
+├── src/
+│   ├── __init__.py
+│   ├── app.py
+│   └── predict.py
 │
 ├── .gitignore
 ├── README.md
@@ -213,7 +227,7 @@ Foram adicionadas informações relacionadas a:
 - acessibilidade;
 - organização das turmas.
 
-O objetivo foi ampliar a representação do contexto territorial, socioeconômico e educacional dos alunos.
+O enriquecimento amplia a representação do contexto territorial, socioeconômico e educacional utilizado pelo modelo.
 
 ---
 
@@ -226,8 +240,7 @@ Foram analisados:
 - qualidade dos dados;
 - valores ausentes;
 - distribuição da variável alvo;
-- variáveis numéricas;
-- variáveis categóricas;
+- variáveis numéricas e categóricas;
 - correlação de Spearman;
 - Cramér's V;
 - diferenças entre regiões e UFs;
@@ -238,9 +251,7 @@ Foram analisados:
 
 ### Data leakage
 
-Durante o EDA foram identificadas variáveis com forte relação com o próprio processo de avaliação.
-
-Entre elas:
+Durante o EDA foram identificadas variáveis fortemente relacionadas ao próprio processo de avaliação:
 
 ```text
 presenca
@@ -248,36 +259,36 @@ preenchimento_caderno
 proficiencia
 ```
 
-Essas variáveis foram removidas dos preditores para evitar que o modelo utilizasse informações que não seriam adequadas em um cenário real de previsão.
+Essas variáveis foram removidas dos preditores para evitar que o modelo utilizasse informações inadequadas em um cenário real de inferência.
 
-A variável `caderno` também foi retirada após investigação de um comportamento operacional atípico, principalmente associado ao caderno 12.
+A variável `caderno` também foi retirada após a investigação de um comportamento operacional atípico, principalmente associado ao caderno 12.
 
-As variáveis de metas municipais e estaduais também foram removidas da modelagem devido à elevada proporção de valores ausentes.
+As variáveis de metas municipais e estaduais foram removidas devido à elevada proporção de valores ausentes.
 
 ---
 
 ## 03 — Modelagem de Machine Learning
 
-Responsável pela construção e avaliação dos modelos supervisionados.
+Responsável pela construção, validação e aplicação dos modelos supervisionados.
 
 O fluxo inclui:
 
 - definição do target;
-- separação em treino, validação e teste;
+- divisão entre treino, validação e teste;
 - pré-processamento;
 - seleção por variância;
 - treinamento de modelos baseline;
 - otimização de hiperparâmetros;
-- ensembles;
-- comparação consolidada;
-- análise de threshold;
+- Voting e Stacking;
+- comparação dos modelos;
+- ajuste de threshold;
 - validação cruzada;
-- avaliação no conjunto de teste;
+- avaliação final;
 - Feature Importance;
 - SHAP;
 - Learning Curve;
 - aplicação prática das probabilidades;
-- salvamento do pipeline.
+- serialização do pipeline.
 
 ---
 
@@ -325,7 +336,7 @@ A base foi dividida em:
 
 A separação foi realizada de forma estratificada, preservando a distribuição da variável alvo.
 
-O conjunto de teste permaneceu isolado durante as etapas de treinamento, tuning e definição do threshold.
+O conjunto de teste permaneceu isolado durante treinamento, tuning, seleção do modelo e definição do threshold.
 
 ---
 
@@ -339,7 +350,7 @@ Foram avaliados inicialmente:
 - KNN;
 - XGBoost.
 
-Os modelos mais promissores avançaram para a otimização de hiperparâmetros utilizando:
+Os modelos mais promissores avançaram para otimização utilizando:
 
 ```text
 RandomizedSearchCV
@@ -364,16 +375,17 @@ Após tuning e ensembles, os principais resultados no conjunto de validação fo
 | XGBoost | 0,5792 | 0,7264 | 0,4255 | 0,5677 | 0,6199 |
 | Regressão Logística | 0,5221 | 0,8723 | 0,1567 | 0,4469 | 0,5562 |
 
-A Regressão Logística apresentou o maior Recall da classe 0, porém com forte perda de desempenho na classe alfabetizada.
+A Regressão Logística apresentou alto Recall para a classe 0, porém com forte perda de desempenho na classe alfabetizada.
 
 XGBoost e Voting também aumentaram a sensibilidade para a classe prioritária, mas apresentaram menor equilíbrio entre as classes.
 
-O **Random Forest otimizado** apresentou o melhor compromisso entre:
+O **Random Forest otimizado** apresentou o melhor compromisso geral entre:
 
 - Recall da classe prioritária;
 - equilíbrio entre as classes;
 - F1 Macro;
 - ROC-AUC;
+- estabilidade;
 - simplicidade operacional.
 
 Por esse motivo, foi selecionado como modelo final.
@@ -388,7 +400,7 @@ O threshold padrão de classificação é:
 0.50
 ```
 
-Como o objetivo principal é aumentar a identificação dos alunos não alfabetizados, diferentes valores foram analisados no conjunto de validação.
+Como o objetivo principal é aumentar a identificação de alunos não alfabetizados, diferentes valores foram avaliados no conjunto de validação.
 
 Foi selecionado:
 
@@ -396,7 +408,7 @@ Foi selecionado:
 Threshold operacional = 0.52
 ```
 
-Esse threshold é aplicado sobre:
+O threshold é aplicado sobre:
 
 ```text
 P(Alfabetizado)
@@ -412,21 +424,21 @@ P(Alfabetizado) < 0.52
 → Não alfabetizado
 ```
 
-A escolha elevou o Recall da classe 0 de aproximadamente:
+Na validação, o Recall da classe 0 aumentou aproximadamente de:
 
 ```text
 63,9% → 78,3%
 ```
 
-na validação, assumindo como trade-off uma redução no Recall da classe alfabetizada.
+assumindo como trade-off uma redução na identificação da classe alfabetizada.
 
-A decisão foi tomada considerando o modelo como ferramenta de **triagem**, priorizando a identificação de alunos potencialmente em risco.
+A decisão foi tomada considerando o modelo como ferramenta de **triagem**, onde identificar alunos potencialmente em risco possui maior prioridade.
 
 ---
 
 # Validação cruzada
 
-O Random Forest foi avaliado utilizando validação cruzada estratificada com 5 folds.
+O Random Forest final foi avaliado utilizando validação cruzada estratificada com 5 folds.
 
 | Métrica | Média | Desvio padrão |
 |---|---:|---:|
@@ -444,7 +456,7 @@ Os baixos desvios entre os folds indicaram comportamento consistente em diferent
 
 # Resultado final
 
-O conjunto de teste foi utilizado após a conclusão das etapas de seleção do modelo e definição do threshold.
+O conjunto de teste foi utilizado somente após a conclusão das decisões de modelagem.
 
 Com o Random Forest e threshold `0.52`, foram obtidos:
 
@@ -465,17 +477,17 @@ O modelo identificou corretamente:
 
 correspondendo a aproximadamente **78% de Recall da classe prioritária**.
 
-O resultado está alinhado ao objetivo do projeto de aumentar a sensibilidade para alunos potencialmente não alfabetizados.
+O resultado está alinhado ao objetivo de aumentar a sensibilidade para alunos potencialmente não alfabetizados.
 
 ---
 
 # Interpretabilidade
 
-A interpretação do modelo foi realizada utilizando duas abordagens.
+A interpretação do modelo foi realizada utilizando **Feature Importance** e **SHAP**.
 
 ## Feature Importance
 
-A importância interna do Random Forest destacou principalmente variáveis relacionadas a:
+Entre as principais variáveis destacadas pelo Random Forest aparecem características relacionadas a:
 
 - Unidade Federativa;
 - região;
@@ -483,13 +495,13 @@ A importância interna do Random Forest destacou principalmente variáveis relac
 - internet para aprendizagem;
 - acesso à internet;
 - densidade demográfica;
-- biblioteca;
+- biblioteca e sala de leitura;
 - água potável;
 - população.
 
 ## SHAP
 
-Para aprofundar a análise foi utilizado o **SHAP — SHapley Additive exPlanations**.
+Para aprofundar a interpretação foi utilizado **SHAP — SHapley Additive exPlanations**.
 
 Foram construídos:
 
@@ -506,20 +518,19 @@ Classe 0 → Não alfabetizado
 
 O SHAP permitiu analisar:
 
-- quais features possuem maior impacto;
-- direção das contribuições;
+- importância global das features;
+- magnitude das contribuições;
+- direção dos impactos;
 - comportamento de variáveis específicas;
-- explicação individual das previsões.
+- explicações individuais das previsões.
 
-> Feature Importance e SHAP representam relações preditivas aprendidas pelo modelo e não devem ser interpretadas como causalidade.
+> Feature Importance e SHAP explicam o comportamento preditivo do modelo, mas não estabelecem relações de causalidade.
 
 ---
 
 # Diagnóstico de overfitting
 
-Foi construída uma **Learning Curve** utilizando o Recall da classe 0.
-
-Resultados finais:
+Foi construída uma **Learning Curve** utilizando Recall da classe 0.
 
 | Indicador | Resultado |
 |---|---:|
@@ -529,19 +540,17 @@ Resultados finais:
 
 O pequeno gap entre treino e validação indica **baixo indício de overfitting**.
 
-As curvas também apresentaram estabilização conforme o volume de dados aumentou, reforçando a consistência do modelo.
+As curvas também apresentaram estabilização conforme o volume de dados aumentou, indicando comportamento consistente do modelo.
 
 ---
 
-# Aplicação prática do modelo
+# Aplicação prática das previsões
 
-Além da classificação, as probabilidades produzidas pelo Random Forest foram utilizadas para construir uma camada de inteligência analítica.
-
-Foi utilizado **DuckDB** para realizar consultas SQL diretamente sobre os resultados das previsões.
+As probabilidades produzidas pelo Random Forest foram transformadas em uma camada de inteligência analítica.
 
 ## Score de risco
 
-A probabilidade da classe 0 foi transformada em um score:
+A probabilidade da classe 0 foi transformada em um score percentual:
 
 ```text
 P(Não alfabetizado)
@@ -549,19 +558,19 @@ P(Não alfabetizado)
 Score de risco (%)
 ```
 
-Esse score permite ordenar os alunos de acordo com o risco estimado.
+Quanto maior o score, maior o risco estimado pelo modelo.
 
 ---
 
 ## Priorização dos alunos
 
-Como o threshold operacional de `0.52` é aplicado à classe alfabetizada, o limite equivalente para a classe de risco corresponde aproximadamente a:
+Como o threshold `0.52` é aplicado sobre a probabilidade da classe alfabetizada, o limite equivalente para o risco de não alfabetização é:
 
 ```text
 48%
 ```
 
-Foi utilizada a seguinte regra:
+A regra operacional utilizada é:
 
 ```text
 Score > 48%
@@ -571,11 +580,11 @@ Score <= 48%
 → Monitoramento
 ```
 
-Essa classificação cria uma primeira fila de priorização para acompanhamento.
+Essa classificação cria uma primeira camada de priorização.
 
-Como uma parcela elevada dos alunos foi classificada como prioritária, foi criado um segundo nível utilizando o **percentil 75 dos scores prioritários**.
+Como uma parcela elevada dos registros foi classificada como prioritária, foi criado um segundo nível utilizando o **percentil 75 dos scores prioritários**.
 
-O limite encontrado foi aproximadamente:
+No conjunto analisado, o limite encontrado foi aproximadamente:
 
 ```text
 56,86%
@@ -587,22 +596,19 @@ permitindo destacar os casos considerados de **alto risco**.
 
 ## Análise municipal
 
-Os resultados foram agregados por município para identificar localidades com maior concentração de alunos classificados como alto risco.
+Os resultados foram agregados por município para identificar localidades com maior concentração de risco.
 
-Para reduzir distorções causadas por poucos registros, foram considerados apenas municípios com pelo menos:
+Foram analisados:
 
-```text
-30 alunos
-```
-
-A análise municipal permite comparar:
-
-- total de alunos;
+- quantidade de alunos;
 - score médio;
+- alunos prioritários;
 - alunos de alto risco;
 - percentual de alto risco.
 
-> Os percentuais representam os registros presentes na amostra analisada e não devem ser interpretados como taxas oficiais de alfabetização municipal.
+Na análise do notebook, foi utilizado um mínimo de 30 registros por município para reduzir distorções causadas por amostras muito pequenas.
+
+> Os resultados representam os registros presentes na amostra analisada e não devem ser interpretados como taxas oficiais de alfabetização municipal.
 
 ---
 
@@ -618,51 +624,91 @@ Foram analisados:
 - quantidade de alunos de alto risco;
 - percentual de alto risco.
 
-Essa visão complementa a análise municipal, permitindo identificar padrões territoriais mais amplos e apoiar decisões de planejamento.
+Essa visão complementa a análise municipal e permite identificar padrões territoriais mais amplos.
 
 ---
 
-# Geração de valor
+# Aplicação Streamlit
 
-A solução transforma a saída do Machine Learning em diferentes níveis de informação:
+Para disponibilizar a solução de forma interativa foi desenvolvida uma aplicação utilizando **Streamlit**.
+
+A aplicação consome diretamente o pipeline serializado e permite executar novas inferências sobre arquivos enviados pelo usuário.
+
+O fluxo da aplicação é:
 
 ```text
-Modelo
-   ↓
-Probabilidade
-   ↓
+Upload CSV / Parquet
+        ↓
+Validação das features
+        ↓
+Pipeline de Machine Learning
+        ↓
+Pré-processamento
+        ↓
+VarianceThreshold
+        ↓
+Random Forest
+        ↓
+predict_proba()
+        ↓
+Threshold 0.52
+        ↓
 Score de risco
-   ↓
-Priorização de alunos
-   ↓
-Casos de alto risco
-   ↓
-Municípios prioritários
-   ↓
-Análise regional
-   ↓
-Apoio à decisão
+        ↓
+Priorização
+        ↓
+Análises territoriais
 ```
 
-Entre as possíveis aplicações estão:
+### Funcionalidades
 
-- priorização de alunos para avaliação pedagógica;
-- direcionamento de acompanhamento;
-- identificação de territórios que demandam maior atenção;
-- apoio à alocação de recursos;
-- planejamento de ações educacionais;
-- suporte à tomada de decisão baseada em dados.
+A aplicação permite:
+
+- upload de arquivos em CSV ou Parquet;
+- execução automática do pipeline salvo;
+- cálculo da probabilidade de alfabetização;
+- cálculo da probabilidade de não alfabetização;
+- geração do score de risco;
+- classificação em Prioritário ou Monitoramento;
+- identificação de registros de alto risco;
+- visualização de indicadores gerais;
+- análise da distribuição dos scores;
+- filtragem por região;
+- filtragem dinâmica por município;
+- análise agregada por região;
+- análise agregada por município;
+- visualização dos resultados individuais;
+- comparação com a situação real quando o target está disponível;
+- download dos resultados processados.
+
+A filtragem funciona de forma hierárquica:
+
+```text
+Todos os registros
+       ↓
+Região
+       ↓
+Município
+       ↓
+Alunos
+```
+
+Ao selecionar uma região ou município, os indicadores, gráficos e tabelas são recalculados automaticamente para o subconjunto escolhido.
+
+> A aplicação utiliza o modelo como ferramenta de triagem e inteligência analítica. As classificações não representam diagnósticos pedagógicos individuais.
 
 ---
 
 # Pipeline final
 
-As principais etapas utilizadas durante a modelagem foram agrupadas em um único pipeline:
+As etapas utilizadas para inferência foram agrupadas em um único `Pipeline`:
 
 ```text
-Dados de entrada
+Dados originais
       ↓
 Pré-processamento
+      ↓
+ColumnTransformer
       ↓
 VarianceThreshold
       ↓
@@ -677,7 +723,19 @@ O pipeline foi exportado utilizando `Joblib`:
 models/modelo_final_random_forest.pkl
 ```
 
-Isso permite reutilizar as mesmas transformações realizadas no treinamento durante novas inferências.
+Dessa forma, novas bases podem ser enviadas diretamente ao pipeline sem necessidade de executar manualmente as etapas de preparação utilizadas durante o treinamento.
+
+A lógica de inferência utilizada pela aplicação está centralizada em:
+
+```text
+src/predict.py
+```
+
+enquanto a interface e as visualizações estão implementadas em:
+
+```text
+src/app.py
+```
 
 ---
 
@@ -693,6 +751,7 @@ Isso permite reutilizar as mesmas transformações realizadas no treinamento dur
 - SQL
 - Matplotlib
 - Seaborn
+- Streamlit
 - Joblib
 - Jupyter Notebook
 - Parquet
@@ -728,7 +787,7 @@ python -m venv .venv
 source .venv/bin/activate
 ```
 
-Instale as dependências:
+Atualize o `pip` e instale as dependências:
 
 ```bash
 python -m pip install --upgrade pip
@@ -739,7 +798,9 @@ pip install -r requirements.txt
 
 # Execução
 
-Execute os notebooks na seguinte ordem:
+## Notebooks
+
+A ordem recomendada é:
 
 ```text
 00 → Preparação do dataset analítico
@@ -748,6 +809,62 @@ Execute os notebooks na seguinte ordem:
 03 → Modelagem de Machine Learning
 ```
 
+## Aplicação Streamlit
+
+Na raiz do projeto:
+
+```bash
+streamlit run src/app.py
+```
+
+Após a inicialização, a aplicação será disponibilizada localmente em:
+
+```text
+http://localhost:8501
+```
+
+---
+
+# Arquivo de entrada da aplicação
+
+A aplicação aceita:
+
+```text
+.csv
+.parquet
+```
+
+Para executar a inferência, o arquivo deve conter as features esperadas pelo pipeline:
+
+```text
+ano
+rede
+sigla_uf
+regiao
+pib_per_capita
+populacao_2022
+area_km2
+densidade_demografica
+qtd_escolas_censo
+prop_escolas_rurais
+prop_escolas_agua_potavel
+prop_escolas_esgoto_rede
+prop_escolas_biblioteca_leitura
+prop_escolas_lab_informatica
+prop_escolas_internet
+prop_escolas_internet_aprendizagem
+prop_escolas_banda_larga
+prop_escolas_rampas_acessibilidade
+media_alunos_turma_fund_ai
+media_alunos_docente_fund_ai
+media_prop_salas_climatizadas
+renda_domiciliar_per_capita_mediana
+```
+
+Colunas adicionais, como identificadores e nome do município, podem ser mantidas no arquivo e são utilizadas nas análises e visualizações da aplicação.
+
+Caso a coluna `alfabetizado` esteja disponível, a aplicação também calcula métricas de desempenho para o lote enviado.
+
 ---
 
 # Limitações
@@ -755,28 +872,30 @@ Execute os notebooks na seguinte ordem:
 Algumas limitações devem ser consideradas:
 
 - o ROC-AUC indica capacidade discriminatória moderada;
-- muitas features representam características contextuais e territoriais;
+- muitas features representam características territoriais e contextuais;
 - o modelo possui poucas informações individuais diretamente relacionadas ao processo de aprendizagem;
-- o threshold de `0.52` aumenta o Recall da classe não alfabetizada, mas reduz o desempenho da classe alfabetizada;
-- municípios e regiões são analisados somente com base nos registros disponíveis na amostra;
-- alunos inseridos em contextos semelhantes podem receber scores próximos;
-- Feature Importance e SHAP não representam causalidade;
-- a solução deve ser utilizada como ferramenta de triagem e não como diagnóstico definitivo.
+- o threshold de `0.52` aumenta o Recall da classe não alfabetizada, reduzindo o desempenho da classe alfabetizada;
+- alunos inseridos em contextos semelhantes podem receber probabilidades próximas;
+- municípios e regiões são analisados apenas com base nos registros disponíveis na base enviada;
+- os resultados territoriais não representam taxas oficiais de alfabetização;
+- Feature Importance e SHAP não estabelecem causalidade;
+- o modelo deve ser utilizado como ferramenta de triagem e não como diagnóstico pedagógico definitivo.
 
 ---
 
 # Próximos passos
 
-Possíveis evoluções do projeto incluem:
+Possíveis evoluções incluem:
 
 - inclusão de novas variáveis socioeconômicas e educacionais;
-- incorporação de informações mais individualizadas dos alunos;
+- incorporação de características mais individualizadas dos alunos;
+- validação automatizada dos arquivos enviados à aplicação;
+- explicações SHAP individuais dentro do Streamlit;
 - monitoramento de drift;
 - rastreamento de experimentos com MLflow;
 - criação de API com FastAPI;
-- desenvolvimento de dashboard para gestores;
 - integração com banco de dados;
-- deploy em cloud;
+- deploy da aplicação em cloud;
 - pipeline CI/CD;
 - monitoramento contínuo do modelo.
 
@@ -784,15 +903,15 @@ Possíveis evoluções do projeto incluem:
 
 # Conclusão
 
-O projeto implementa um fluxo completo de Ciência de Dados aplicado ao contexto da alfabetização, desde a preparação e enriquecimento dos dados até a construção e interpretação do modelo final.
+O projeto implementa um fluxo completo de Ciência de Dados aplicado ao contexto da alfabetização, abrangendo desde a preparação e enriquecimento dos dados até a disponibilização de uma aplicação interativa para consumo das previsões.
 
-O **Random Forest otimizado** foi selecionado por apresentar o melhor equilíbrio geral entre os modelos avaliados.
+O **Random Forest otimizado** foi selecionado como modelo final por apresentar o melhor equilíbrio geral entre as soluções avaliadas.
 
-Com o threshold operacional de **0,52**, o modelo alcançou aproximadamente **78% de Recall para alunos não alfabetizados no conjunto de teste**, atendendo ao objetivo de priorizar a identificação da classe de maior interesse.
+Com o threshold operacional de **0,52**, o modelo alcançou aproximadamente **78% de Recall para alunos não alfabetizados no conjunto de teste**, alinhando o comportamento da solução ao objetivo de priorização da classe de maior interesse.
 
-As análises de **Feature Importance, SHAP e Learning Curve** contribuíram para avaliar transparência, comportamento e capacidade de generalização do modelo.
+As análises com **Feature Importance, SHAP e Learning Curve** contribuíram para avaliar a interpretabilidade, estabilidade e comportamento do modelo.
 
-Além da previsão, as probabilidades foram transformadas em um **score de risco**, permitindo gerar análises em nível de:
+As probabilidades foram transformadas em um **score de risco**, permitindo estruturar a análise em diferentes níveis:
 
 ```text
 Aluno
@@ -802,7 +921,9 @@ Município
 Região
 ```
 
-Dessa forma, o projeto demonstra como Machine Learning pode ser utilizado não apenas para gerar previsões, mas também para apoiar **triagem, priorização e planejamento de ações educacionais orientadas por dados**.
+Por fim, a aplicação **Streamlit** transforma o pipeline de Machine Learning em uma solução interativa, permitindo enviar novas bases, gerar previsões, explorar os resultados territorialmente e exportar as classificações obtidas.
+
+Dessa forma, o projeto demonstra um fluxo que vai além do treinamento de modelos, conectando **dados, Machine Learning, interpretabilidade e aplicação prática para apoio à tomada de decisão educacional**.
 
 ---
 

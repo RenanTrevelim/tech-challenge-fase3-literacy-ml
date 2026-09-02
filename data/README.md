@@ -1,145 +1,172 @@
-# Data
+# Dados do projeto
 
-Esta pasta concentra os datasets utilizados no desenvolvimento do **Tech Challenge — Fase 3**, organizados em três camadas:
+Esta pasta concentra os conjuntos de dados utilizados ao longo do projeto, organizados por finalidade e estágio de processamento.
+
+A estrutura segue uma separação entre **dados intermediários, dados consolidados, fontes externas e dados utilizados pela aplicação**, facilitando a rastreabilidade e a reprodução do fluxo de preparação dos dados.
+
+---
+
+## Estrutura
 
 ```text
 data/
-├── bronze/
+│
+├── app/
+│   └── dados_teste.parquet
+│
+├── external/
+│   ├── microdados_censo_escolar_2023.zip
+│   ├── microdados_censo_escolar_2024.zip
+│   └── PIB dos Municípios - base de dados 2010-2023.xlsx
+│
+├── gold/
+│   ├── dataset_eda.parquet
+│   ├── dataset_modelagem.parquet
+│   ├── gold_alunos.parquet
+│   ├── gold_dataset_analitico.parquet
+│   ├── gold_dataset_enriquecido.parquet
+│   └── gold_municipal.parquet
+│
 ├── silver/
-└── gold/
+│   ├── alunos.parquet
+│   └── municipio.parquet
+│
+└── README.md
 ```
 
-A separação entre as camadas facilita a organização dos dados e deixa claro quais arquivos representam a entrada, o tratamento intermediário e as bases finais utilizadas nas análises.
-
 ---
 
-## Bronze
+## `app/`
 
-A camada Bronze contém os dados em formato Parquet, preservando a estrutura original utilizada no projeto.
+Contém os dados utilizados na demonstração da aplicação Streamlit.
 
-Principais conjuntos de dados:
+### `dados_teste.parquet`
 
-* dados de alunos;
-* indicadores de alfabetização por município;
-* indicadores de alfabetização por UF;
-* metas municipais de alfabetização;
-* metas estaduais de alfabetização;
-* metas nacionais de alfabetização.
+Subconjunto de teste utilizado para validar o funcionamento do pipeline exportado e alimentar a aplicação interativa.
 
-Essa camada funciona como ponto de partida para as transformações realizadas nas etapas seguintes.
-
----
-
-## Silver
-
-A camada Silver contém os dados tratados, padronizados e organizados para consumo analítico.
-
-Arquivos principais:
+Os registros são enviados ao pipeline completo, que executa automaticamente:
 
 ```text
-alunos.parquet
-municipio.parquet
+Dados de entrada
+      ↓
+Pré-processamento
+      ↓
+VarianceThreshold
+      ↓
+Random Forest
+      ↓
+Probabilidades
+      ↓
+Score de risco
+      ↓
+Priorização
 ```
+
+Esse arquivo também permite demonstrar os filtros e análises territoriais da aplicação.
+
+---
+
+## `external/`
+
+Armazena as fontes externas utilizadas no enriquecimento da base analítica.
+
+Entre os principais conjuntos utilizados estão:
+
+- microdados do **Censo Escolar 2023**;
+- microdados do **Censo Escolar 2024**;
+- dados de **PIB dos municípios**;
+- indicadores socioeconômicos;
+- informações provenientes de fontes oficiais como **IBGE, SIDRA e INEP**.
+
+Esses dados foram utilizados para adicionar informações territoriais, econômicas, populacionais e educacionais ao dataset original.
+
+---
+
+## `silver/`
+
+Contém as bases intermediárias provenientes das etapas anteriores de tratamento dos dados.
 
 ### `alunos.parquet`
 
-Mantém os dados em nível individual, com informações relacionadas a aluno, escola, município, rede de ensino, presença, alfabetização e proficiência.
-
-Granularidade:
-
-```text
-1 linha = 1 aluno por ano
-```
+Base tratada com informações em nível de aluno.
 
 ### `municipio.parquet`
 
-Contém os indicadores educacionais consolidados em nível municipal, incluindo informações de alfabetização e metas.
+Base tratada contendo informações consolidadas em nível municipal.
 
-Essa base é utilizada como apoio para análises territoriais e para enriquecimento das bases finais.
+A camada Silver funciona como uma etapa intermediária antes da construção das bases analíticas consolidadas.
 
 ---
 
-## Gold
+## `gold/`
 
-A camada Gold contém os datasets preparados para as etapas de **Análise Exploratória de Dados e Machine Learning**.
-
-Arquivos principais:
-
-```text
-gold_alunos.parquet
-gold_municipal.parquet
-```
+Contém os datasets consolidados utilizados nas etapas de análise exploratória, enriquecimento e Machine Learning.
 
 ### `gold_alunos.parquet`
 
-Base individual utilizada para:
-
-* análise do comportamento dos alunos;
-* investigação da variável de alfabetização;
-* preparação dos modelos supervisionados;
-* avaliação de possíveis variáveis explicativas.
-
-A base mantém variáveis relevantes para análise, enquanto decisões como seleção de features, tratamento de valores faltantes e prevenção de data leakage são realizadas posteriormente durante a etapa de modelagem.
+Base consolidada contendo informações relacionadas aos alunos.
 
 ### `gold_municipal.parquet`
 
-Base analítica voltada para:
+Base consolidada com informações em nível municipal.
 
-* análise territorial;
-* comparação entre municípios;
-* acompanhamento de indicadores;
-* análise de metas educacionais;
-* identificação de regiões com maior vulnerabilidade;
-* geração de insights para apoio à tomada de decisão.
+### `gold_dataset_analitico.parquet`
 
----
+Dataset construído a partir da integração das principais informações necessárias para a Fase 3.
 
-## Estrutura Atual
+### `gold_dataset_enriquecido.parquet`
 
-As principais bases finais possuem os seguintes volumes:
+Versão do dataset analítico após a inclusão das fontes externas utilizadas no enriquecimento.
 
-```text
-Silver Alunos
-57.782 registros
-13 colunas
+### `dataset_eda.parquet`
 
-Silver Municipal
-23.995 registros
-47 colunas
+Base preparada para a etapa de **Análise Exploratória de Dados**, mantendo informações necessárias para análises estatísticas, territoriais e de negócio.
 
-Gold Alunos
-57.782 registros
-16 colunas
+### `dataset_modelagem.parquet`
 
-Gold Municipal
-23.995 registros
-51 colunas
-```
+Base final preparada para o treinamento dos modelos de Machine Learning, contendo somente as variáveis selecionadas para a etapa de modelagem.
 
 ---
 
-## Fluxo dos Dados
+## Fluxo dos dados
+
+O fluxo principal utilizado no projeto pode ser resumido como:
 
 ```text
-Bronze
-   ↓
 Silver
-   ↓
+  +
+Dados externos
+      ↓
+Preparação e integração
+      ↓
+Dataset analítico
+      ↓
+Enriquecimento
+      ↓
 Gold
-   ↓
-EDA
-   ↓
+      ↓
+Análise Exploratória
+      ↓
+Dataset de modelagem
+      ↓
 Machine Learning
-   ↓
-Avaliação e Interpretabilidade
+      ↓
+Conjunto de teste
+      ↓
+Aplicação Streamlit
 ```
-
-A camada Gold é utilizada como principal fonte de dados para as análises e modelos desenvolvidos na Fase 3.
 
 ---
 
-## Observação
+## Organização das camadas
 
-Os dados originais utilizados para geração da camada Bronze não são mantidos neste diretório.
+A separação dos dados por finalidade permite manter uma estrutura mais clara durante o desenvolvimento:
 
-A pasta `data/` contém apenas os datasets necessários para dar continuidade às etapas analíticas do projeto.
+| Camada | Finalidade |
+|---|---|
+| `external` | Fontes externas utilizadas no enriquecimento |
+| `silver` | Dados intermediários e tratados |
+| `gold` | Bases consolidadas para análise e modelagem |
+| `app` | Dados utilizados na demonstração da aplicação |
+
+Essa organização ajuda a manter **rastreabilidade, reprodutibilidade e separação entre as diferentes etapas do pipeline de dados**.
