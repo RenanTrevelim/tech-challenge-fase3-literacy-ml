@@ -434,6 +434,9 @@ assumindo como trade-off uma redução na identificação da classe alfabetizada
 
 A decisão foi tomada considerando o modelo como ferramenta de **triagem**, onde identificar alunos potencialmente em risco possui maior prioridade.
 
+<img width="1027" height="495" alt="image" src="https://github.com/user-attachments/assets/9fe660d3-ebdd-4122-859a-2262fc14e122" />
+
+
 ---
 
 # Validação cruzada
@@ -499,6 +502,9 @@ Entre as principais variáveis destacadas pelo Random Forest aparecem caracterí
 - água potável;
 - população.
 
+<img width="1022" height="441" alt="image" src="https://github.com/user-attachments/assets/64e83b5e-8582-4e7a-965e-bce345e6a481" />
+
+
 ## SHAP
 
 Para aprofundar a interpretação foi utilizado **SHAP — SHapley Additive exPlanations**.
@@ -526,6 +532,12 @@ O SHAP permitiu analisar:
 
 > Feature Importance e SHAP explicam o comportamento preditivo do modelo, mas não estabelecem relações de causalidade.
 
+
+> Resultado da Importância Global das Features (SHAP):
+
+<img width="858" height="531" alt="image" src="https://github.com/user-attachments/assets/15434b8c-5ac9-42f5-b014-92eff0243d46" />
+
+
 ---
 
 # Diagnóstico de overfitting
@@ -541,6 +553,9 @@ Foi construída uma **Learning Curve** utilizando Recall da classe 0.
 O pequeno gap entre treino e validação indica **baixo indício de overfitting**.
 
 As curvas também apresentaram estabilização conforme o volume de dados aumentou, indicando comportamento consistente do modelo.
+
+<img width="1027" height="502" alt="image" src="https://github.com/user-attachments/assets/c3f7a5c5-bc7e-450a-b2e5-ade1f1a3781d" />
+
 
 ---
 
@@ -696,6 +711,9 @@ Alunos
 Ao selecionar uma região ou município, os indicadores, gráficos e tabelas são recalculados automaticamente para o subconjunto escolhido.
 
 > A aplicação utiliza o modelo como ferramenta de triagem e inteligência analítica. As classificações não representam diagnósticos pedagógicos individuais.
+
+<img width="1588" height="701" alt="image" src="https://github.com/user-attachments/assets/081d6b95-ab3b-4590-a150-95d3e30b12d8" />
+
 
 ---
 
