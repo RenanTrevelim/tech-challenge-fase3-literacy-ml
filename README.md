@@ -817,7 +817,7 @@ pip install -r requirements.txt
 
 ## Notebooks
 
-A ordem recomendada é:
+A ordem recomendada de execução é:
 
 ```text
 00 → Preparação do dataset analítico
@@ -826,19 +826,72 @@ A ordem recomendada é:
 03 → Modelagem de Machine Learning
 ```
 
+---
+
 ## Aplicação Streamlit
 
-Na raiz do projeto:
+Na raiz do projeto, execute:
 
 ```bash
 streamlit run src/app.py
 ```
 
-Após a inicialização, a aplicação será disponibilizada localmente em:
+Após a inicialização, a aplicação estará disponível em:
 
 ```text
 http://localhost:8501
 ```
+
+A aplicação permite enviar arquivos em formato `CSV` ou `Parquet`, executar o pipeline completo de Machine Learning e gerar:
+
+- probabilidades de alfabetização e não alfabetização;
+- score de risco;
+- classificação em prioritário ou monitoramento;
+- análises por região e município;
+- resultados individuais;
+- exportação dos resultados processados.
+
+### Arquivo para teste da aplicação
+
+Um arquivo de exemplo já está disponível no projeto em:
+
+```text
+data/app/dados_teste.parquet
+```
+
+Esse arquivo corresponde ao conjunto de teste utilizado no projeto e pode ser carregado diretamente na interface Streamlit para validar o funcionamento completo da aplicação.
+
+---
+
+# Execução com Docker
+
+O projeto também pode ser executado utilizando Docker.
+
+Na raiz do projeto, faça o build da imagem:
+
+```bash
+docker build -t tech-challenge-fase3-literacy-ml .
+```
+
+Depois execute o container:
+
+```bash
+docker run --rm -p 8501:8501 tech-challenge-fase3-literacy-ml
+```
+
+Após a inicialização, acesse:
+
+```text
+http://localhost:8501
+```
+
+Para testar a aplicação dentro do container, utilize o arquivo:
+
+```text
+data/app/dados_teste.parquet
+```
+
+A execução via Docker garante um ambiente padronizado e reprodutível para utilização da aplicação.
 
 ---
 
