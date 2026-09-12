@@ -1,10 +1,12 @@
 # Tech Challenge Fase 3 — Predição e Inteligência Analítica para Alfabetização no Brasil
 
-Projeto de Ciência de Dados desenvolvido para o **Tech Challenge — Fase 3**, com foco na construção de uma solução de Machine Learning capaz de apoiar a identificação de alunos potencialmente **não alfabetizados**.
+Projeto de Ciência de Dados desenvolvido para o **Tech Challenge — Fase 3**, com foco na construção de uma solução de Machine Learning capaz de apoiar a identificação e priorização de alunos potencialmente **não alfabetizados**.
 
 A solução utiliza dados provenientes da **camada Gold construída na Fase 2**, enriquecidos com informações territoriais, populacionais, socioeconômicas e educacionais.
 
-O projeto contempla **preparação e enriquecimento dos dados, análise exploratória, modelagem supervisionada, otimização de hiperparâmetros, ensembles, validação, interpretabilidade, geração de scores de risco e uma aplicação interativa em Streamlit** para consumo das previsões.
+O projeto contempla um fluxo completo de Ciência de Dados:
+
+**preparação dos dados → enriquecimento → análise exploratória → modelagem → validação → interpretabilidade → inteligência analítica → aplicação Streamlit → containerização com Docker.**
 
 ---
 
@@ -21,7 +23,7 @@ O problema foi estruturado como uma classificação supervisionada:
 1 → Alfabetizado
 ```
 
-Como o principal objetivo é apoiar a identificação de alunos potencialmente não alfabetizados, a **classe 0** foi definida como prioritária durante a avaliação dos modelos.
+Como o principal objetivo é apoiar a identificação de alunos potencialmente não alfabetizados, a **classe 0** foi definida como prioritária durante a avaliação e aplicação dos modelos.
 
 A solução permite analisar os resultados em diferentes níveis:
 
@@ -44,7 +46,7 @@ Os principais objetivos do projeto são:
 - utilizar a camada Gold construída na Fase 2;
 - enriquecer os dados com informações externas oficiais;
 - investigar fatores associados à alfabetização;
-- analisar padrões territoriais e socioeconômicos;
+- analisar padrões territoriais, educacionais e socioeconômicos;
 - identificar e remover possíveis fontes de data leakage;
 - construir um pipeline completo e reprodutível de Machine Learning;
 - comparar diferentes algoritmos de classificação;
@@ -54,15 +56,17 @@ Os principais objetivos do projeto são:
 - interpretar as previsões com Feature Importance e SHAP;
 - priorizar a identificação de alunos não alfabetizados;
 - transformar probabilidades em scores de risco;
-- disponibilizar os resultados em uma aplicação Streamlit interativa.
+- analisar resultados por município e região;
+- disponibilizar os resultados em uma aplicação Streamlit interativa;
+- garantir reprodutibilidade da aplicação por meio de Docker.
 
 ---
 
 # Dados utilizados
 
-A base analítica foi construída a partir da integração dos dados da camada **Gold** produzida na Fase 2.
+A base analítica foi construída a partir dos dados da camada **Gold** produzida durante a Fase 2.
 
-Posteriormente, o dataset foi enriquecido com informações externas para ampliar a representação do contexto territorial, econômico e educacional dos alunos.
+Posteriormente, o dataset foi enriquecido com fontes externas oficiais para ampliar a representação do contexto territorial, socioeconômico e educacional dos alunos.
 
 Foram incorporadas informações relacionadas a:
 
@@ -99,7 +103,7 @@ município + ano + rede
 
 permitindo incorporar informações educacionais complementares à base individual.
 
-> Os indicadores agregados representam o contexto educacional do município, ano e rede e não necessariamente a escola específica frequentada pelo aluno.
+> Os indicadores agregados representam o contexto educacional do município, ano e rede, e não necessariamente a escola específica frequentada pelo aluno.
 
 ---
 
@@ -157,6 +161,8 @@ Aplicação Streamlit
         ├── Análise municipal
         ├── Análise regional
         └── Exportação dos resultados
+        ↓
+Docker
 ```
 
 ---
@@ -167,10 +173,20 @@ Aplicação Streamlit
 tech-challenge-fase3-literacy-ml/
 │
 ├── data/
+│   ├── app/
+│   │   └── dados_teste.parquet
 │   ├── external/
 │   ├── silver/
 │   ├── gold/
-│   └── app/
+│   └── README.md
+│
+├── images/
+│   ├── Aplicação Streamlit.png
+│   ├── Aplicação Streamlit - Parte 2.png
+│   ├── Resultado Modelo Final.png
+│   ├── Feature Importance - ...
+│   ├── SHAP - ...
+│   └── Verificando Overfitting.png
 │
 ├── models/
 │   └── modelo_final_random_forest.pkl
@@ -179,7 +195,11 @@ tech-challenge-fase3-literacy-ml/
 │   ├── 00_preparacao_dataset_analitico.ipynb
 │   ├── 01_enriquecimento_dados_externos.ipynb
 │   ├── 02_analise_exploratoria.ipynb
-│   └── 03_modelos_machine_learning.ipynb
+│   ├── 03_modelos_machine_learning.ipynb
+│   └── README.md
+│
+├── reports/
+│   └── Tech Challenge Fase 3 - Apresentação.pdf
 │
 ├── src/
 │   ├── __init__.py
@@ -187,6 +207,7 @@ tech-challenge-fase3-literacy-ml/
 │   └── predict.py
 │
 ├── .gitignore
+├── Dockerfile
 ├── README.md
 └── requirements.txt
 ```
@@ -233,7 +254,7 @@ O enriquecimento amplia a representação do contexto territorial, socioeconômi
 
 ## 02 — Análise Exploratória de Dados
 
-Responsável pela investigação dos padrões presentes na base antes da modelagem.
+Responsável pela investigação dos principais padrões presentes na base antes da modelagem.
 
 Foram analisados:
 
@@ -269,7 +290,7 @@ As variáveis de metas municipais e estaduais foram removidas devido à elevada 
 
 ## 03 — Modelagem de Machine Learning
 
-Responsável pela construção, validação e aplicação dos modelos supervisionados.
+Responsável pela construção, validação, interpretação e aplicação dos modelos supervisionados.
 
 O fluxo inclui:
 
@@ -288,7 +309,8 @@ O fluxo inclui:
 - SHAP;
 - Learning Curve;
 - aplicação prática das probabilidades;
-- serialização do pipeline.
+- análise municipal e regional;
+- serialização do pipeline final.
 
 ---
 
@@ -432,7 +454,7 @@ Na validação, o Recall da classe 0 aumentou aproximadamente de:
 
 assumindo como trade-off uma redução na identificação da classe alfabetizada.
 
-A decisão foi tomada considerando o modelo como ferramenta de **triagem**, onde identificar alunos potencialmente em risco possui maior prioridade.
+A decisão foi tomada considerando o modelo como ferramenta de **triagem**, priorizando a identificação de alunos potencialmente em risco.
 
 ---
 
@@ -479,7 +501,7 @@ correspondendo a aproximadamente **78% de Recall da classe prioritária**.
 
 O resultado está alinhado ao objetivo de aumentar a sensibilidade para alunos potencialmente não alfabetizados.
 
-<img width="1027" height="495" alt="image" src="https://github.com/user-attachments/assets/9fe660d3-ebdd-4122-859a-2262fc14e122" />
+<img width="1027" height="495" alt="Resultado do modelo final" src="https://github.com/user-attachments/assets/9fe660d3-ebdd-4122-859a-2262fc14e122" />
 
 ---
 
@@ -501,8 +523,9 @@ Entre as principais variáveis destacadas pelo Random Forest aparecem caracterí
 - água potável;
 - população.
 
-<img width="1022" height="441" alt="image" src="https://github.com/user-attachments/assets/64e83b5e-8582-4e7a-965e-bce345e6a481" />
+<img width="1022" height="441" alt="Feature Importance" src="https://github.com/user-attachments/assets/64e83b5e-8582-4e7a-965e-bce345e6a481" />
 
+---
 
 ## SHAP
 
@@ -531,11 +554,9 @@ O SHAP permitiu analisar:
 
 > Feature Importance e SHAP explicam o comportamento preditivo do modelo, mas não estabelecem relações de causalidade.
 
+### Importância global das features
 
-> Resultado da Importância Global das Features (SHAP):
-
-<img width="858" height="531" alt="image" src="https://github.com/user-attachments/assets/15434b8c-5ac9-42f5-b014-92eff0243d46" />
-
+<img width="858" height="531" alt="SHAP - Importância Global" src="https://github.com/user-attachments/assets/15434b8c-5ac9-42f5-b014-92eff0243d46" />
 
 ---
 
@@ -551,10 +572,9 @@ Foi construída uma **Learning Curve** utilizando Recall da classe 0.
 
 O pequeno gap entre treino e validação indica **baixo indício de overfitting**.
 
-As curvas também apresentaram estabilização conforme o volume de dados aumentou, indicando comportamento consistente do modelo.
+As curvas apresentaram estabilização conforme o volume de dados aumentou, reforçando a consistência do comportamento do modelo.
 
-<img width="1027" height="502" alt="image" src="https://github.com/user-attachments/assets/c3f7a5c5-bc7e-450a-b2e5-ade1f1a3781d" />
-
+<img width="1027" height="502" alt="Learning Curve" src="https://github.com/user-attachments/assets/c3f7a5c5-bc7e-450a-b2e5-ade1f1a3781d" />
 
 ---
 
@@ -606,6 +626,8 @@ No conjunto analisado, o limite encontrado foi aproximadamente:
 
 permitindo destacar os casos considerados de **alto risco**.
 
+> O limite de alto risco representa uma estratégia adicional de priorização sobre a amostra analisada e não altera o threshold operacional do modelo.
+
 ---
 
 ## Análise municipal
@@ -620,7 +642,7 @@ Foram analisados:
 - alunos de alto risco;
 - percentual de alto risco.
 
-Na análise do notebook, foi utilizado um mínimo de 30 registros por município para reduzir distorções causadas por amostras muito pequenas.
+Na análise do notebook foi utilizado um mínimo de 30 registros por município para reduzir distorções causadas por amostras muito pequenas.
 
 > Os resultados representam os registros presentes na amostra analisada e não devem ser interpretados como taxas oficiais de alfabetização municipal.
 
@@ -646,7 +668,7 @@ Essa visão complementa a análise municipal e permite identificar padrões terr
 
 Para disponibilizar a solução de forma interativa foi desenvolvida uma aplicação utilizando **Streamlit**.
 
-A aplicação consome diretamente o pipeline serializado e permite executar novas inferências sobre arquivos enviados pelo usuário.
+A aplicação consome diretamente o pipeline serializado e permite executar inferências sobre arquivos enviados pelo usuário.
 
 O fluxo da aplicação é:
 
@@ -692,7 +714,7 @@ A aplicação permite:
 - análise agregada por região;
 - análise agregada por município;
 - visualização dos resultados individuais;
-- comparação com a situação real quando o target está disponível;
+- cálculo de métricas quando o target está disponível;
 - download dos resultados processados.
 
 A filtragem funciona de forma hierárquica:
@@ -711,14 +733,13 @@ Ao selecionar uma região ou município, os indicadores, gráficos e tabelas sã
 
 > A aplicação utiliza o modelo como ferramenta de triagem e inteligência analítica. As classificações não representam diagnósticos pedagógicos individuais.
 
-<img width="1588" height="701" alt="image" src="https://github.com/user-attachments/assets/081d6b95-ab3b-4590-a150-95d3e30b12d8" />
-
+<img width="1588" height="701" alt="Aplicação Streamlit" src="https://github.com/user-attachments/assets/081d6b95-ab3b-4590-a150-95d3e30b12d8" />
 
 ---
 
 # Pipeline final
 
-As etapas utilizadas para inferência foram agrupadas em um único `Pipeline`:
+As etapas utilizadas durante a inferência foram agrupadas em um único `Pipeline`:
 
 ```text
 Dados originais
@@ -740,7 +761,7 @@ O pipeline foi exportado utilizando `Joblib`:
 models/modelo_final_random_forest.pkl
 ```
 
-Dessa forma, novas bases podem ser enviadas diretamente ao pipeline sem necessidade de executar manualmente as etapas de preparação utilizadas durante o treinamento.
+Dessa forma, novas bases podem ser enviadas diretamente ao pipeline sem necessidade de executar manualmente as transformações utilizadas durante o treinamento.
 
 A lógica de inferência utilizada pela aplicação está centralizada em:
 
@@ -772,6 +793,7 @@ src/app.py
 - Joblib
 - Jupyter Notebook
 - Parquet
+- Docker
 - Git
 - GitHub
 
@@ -817,7 +839,7 @@ pip install -r requirements.txt
 
 ## Notebooks
 
-A ordem recomendada de execução é:
+A ordem recomendada é:
 
 ```text
 00 → Preparação do dataset analítico
@@ -830,36 +852,29 @@ A ordem recomendada de execução é:
 
 ## Aplicação Streamlit
 
-Na raiz do projeto, execute:
+Na raiz do projeto:
 
 ```bash
 streamlit run src/app.py
 ```
 
-Após a inicialização, a aplicação estará disponível em:
+Após a inicialização, acesse:
 
 ```text
 http://localhost:8501
 ```
 
-A aplicação permite enviar arquivos em formato `CSV` ou `Parquet`, executar o pipeline completo de Machine Learning e gerar:
+A aplicação aceita arquivos em formato `CSV` ou `Parquet`.
 
-- probabilidades de alfabetização e não alfabetização;
-- score de risco;
-- classificação em prioritário ou monitoramento;
-- análises por região e município;
-- resultados individuais;
-- exportação dos resultados processados.
+### Arquivo para teste
 
-### Arquivo para teste da aplicação
-
-Um arquivo de exemplo já está disponível no projeto em:
+Um arquivo de exemplo já está disponível em:
 
 ```text
 data/app/dados_teste.parquet
 ```
 
-Esse arquivo corresponde ao conjunto de teste utilizado no projeto e pode ser carregado diretamente na interface Streamlit para validar o funcionamento completo da aplicação.
+Esse arquivo corresponde ao conjunto de teste utilizado no projeto e pode ser carregado diretamente no Streamlit para validar o fluxo completo de inferência.
 
 ---
 
@@ -873,25 +888,25 @@ Na raiz do projeto, faça o build da imagem:
 docker build -t tech-challenge-fase3-literacy-ml .
 ```
 
-Depois execute o container:
+Execute o container:
 
 ```bash
 docker run --rm -p 8501:8501 tech-challenge-fase3-literacy-ml
 ```
 
-Após a inicialização, acesse:
+Depois acesse:
 
 ```text
 http://localhost:8501
 ```
 
-Para testar a aplicação dentro do container, utilize o arquivo:
+Para testar a aplicação, utilize:
 
 ```text
 data/app/dados_teste.parquet
 ```
 
-A execução via Docker garante um ambiente padronizado e reprodutível para utilização da aplicação.
+A execução via Docker garante um ambiente padronizado e reprodutível para utilização da solução.
 
 ---
 
@@ -904,7 +919,7 @@ A aplicação aceita:
 .parquet
 ```
 
-Para executar a inferência, o arquivo deve conter as features esperadas pelo pipeline:
+Para executar a inferência, o arquivo deve conter as features utilizadas pelo pipeline:
 
 ```text
 ano
@@ -931,9 +946,45 @@ media_prop_salas_climatizadas
 renda_domiciliar_per_capita_mediana
 ```
 
-Colunas adicionais, como identificadores e nome do município, podem ser mantidas no arquivo e são utilizadas nas análises e visualizações da aplicação.
+Colunas adicionais, como identificadores e nome do município, podem ser mantidas e utilizadas nas análises e visualizações da aplicação.
 
 Caso a coluna `alfabetizado` esteja disponível, a aplicação também calcula métricas de desempenho para o lote enviado.
+
+---
+
+# Materiais do projeto
+
+## Imagens
+
+A pasta:
+
+```text
+images/
+```
+
+contém as principais visualizações produzidas ao longo do projeto, incluindo:
+
+- resultado do modelo final;
+- Feature Importance;
+- análises SHAP;
+- Learning Curve;
+- screenshots da aplicação Streamlit.
+
+## Apresentação executiva
+
+A apresentação utilizada para sintetizar o projeto está disponível em:
+
+```text
+reports/
+```
+
+O material apresenta:
+
+- problema educacional;
+- principais insights;
+- valor estratégico da solução;
+- possíveis aplicações em políticas públicas educacionais;
+- conclusão executiva.
 
 ---
 
@@ -991,14 +1042,28 @@ Município
 Região
 ```
 
-Por fim, a aplicação **Streamlit** transforma o pipeline de Machine Learning em uma solução interativa, permitindo enviar novas bases, gerar previsões, explorar os resultados territorialmente e exportar as classificações obtidas.
+A aplicação **Streamlit** transforma o pipeline de Machine Learning em uma solução interativa, permitindo enviar novas bases, gerar previsões, explorar territorialmente os resultados e exportar as classificações obtidas.
 
-Dessa forma, o projeto demonstra um fluxo que vai além do treinamento de modelos, conectando **dados, Machine Learning, interpretabilidade e aplicação prática para apoio à tomada de decisão educacional**.
+Por fim, a utilização de **Docker** permite reproduzir a aplicação em um ambiente padronizado, reduzindo dependências relacionadas à configuração local.
+
+Dessa forma, o projeto vai além do treinamento de modelos e conecta:
+
+```text
+Dados
+  ↓
+Evidências
+  ↓
+Prioridades
+  ↓
+Apoio à decisão
+```
+
+demonstrando como dados públicos, Machine Learning e inteligência analítica podem ser combinados para apoiar ações educacionais orientadas por evidências.
 
 ---
 
 ## Autor
 
-Desenvolvido por **Renan Trevelim**.
+Desenvolvido por **Renan Assis Trevelim**.
 
 Projeto desenvolvido para o **Tech Challenge — Fase 3**, com foco em Ciência de Dados, Machine Learning, interpretabilidade e inteligência analítica aplicada à alfabetização no Brasil.
