@@ -6,7 +6,27 @@ A solução utiliza dados provenientes da **camada Gold construída na Fase 2**,
 
 O projeto contempla um fluxo completo de Ciência de Dados:
 
-**preparação dos dados → enriquecimento → análise exploratória → modelagem → validação → interpretabilidade → inteligência analítica → aplicação Streamlit → containerização com Docker.**
+```text
+Preparação dos dados
+        ↓
+Enriquecimento
+        ↓
+Análise Exploratória
+        ↓
+Machine Learning
+        ↓
+Validação
+        ↓
+Interpretabilidade
+        ↓
+Score de risco
+        ↓
+Inteligência territorial
+        ↓
+Aplicação Streamlit
+        ↓
+Docker
+```
 
 ---
 
@@ -56,8 +76,9 @@ Os principais objetivos do projeto são:
 - interpretar as previsões com Feature Importance e SHAP;
 - priorizar a identificação de alunos não alfabetizados;
 - transformar probabilidades em scores de risco;
-- analisar resultados por município e região;
-- disponibilizar os resultados em uma aplicação Streamlit interativa;
+- analisar resultados por aluno, município e região;
+- disponibilizar os resultados em uma aplicação Streamlit;
+- organizar código reutilizável no diretório `src`;
 - garantir reprodutibilidade da aplicação por meio de Docker.
 
 ---
@@ -184,8 +205,9 @@ tech-challenge-fase3-literacy-ml/
 │   ├── Aplicação Streamlit.png
 │   ├── Aplicação Streamlit - Parte 2.png
 │   ├── Resultado Modelo Final.png
-│   ├── Feature Importance - ...
-│   ├── SHAP - ...
+│   ├── Feature Importance - Modelo Final.png
+│   ├── SHAP - Explicando uma precição.png
+│   ├── SHAP - Importância Global das Features.png
 │   └── Verificando Overfitting.png
 │
 ├── models/
@@ -204,13 +226,71 @@ tech-challenge-fase3-literacy-ml/
 ├── src/
 │   ├── __init__.py
 │   ├── app.py
-│   └── predict.py
+│   ├── predict.py
+│   │
+│   ├── preprocessing/
+│   │   └── preprocessing.py
+│   │
+│   ├── modeling/
+│   │   └── modeling.py
+│   │
+│   ├── evaluation/
+│   │   └── evaluation.py
+│   │
+│   └── visualization/
+│       └── visualization.py
 │
 ├── .gitignore
 ├── Dockerfile
 ├── README.md
 └── requirements.txt
 ```
+
+---
+
+# Organização do código
+
+Os notebooks concentram o processo de **experimentação, análise e documentação da modelagem**, enquanto o diretório `src/` concentra componentes reutilizáveis da solução.
+
+### `src/preprocessing`
+
+Responsável por funções auxiliares relacionadas à validação e seleção das features esperadas pelo pipeline final.
+
+### `src/modeling`
+
+Contém funções relacionadas ao carregamento e utilização do modelo final serializado.
+
+### `src/evaluation`
+
+Centraliza funções de avaliação do modelo, incluindo métricas e aplicação do threshold operacional.
+
+### `src/visualization`
+
+Contém funções reutilizáveis para geração de visualizações como matriz de confusão e curva ROC.
+
+### `src/predict.py`
+
+Responsável pela lógica de inferência utilizada pela aplicação:
+
+```text
+Validação das features
+        ↓
+Pipeline final
+        ↓
+predict_proba()
+        ↓
+Threshold
+        ↓
+Score de risco
+        ↓
+Priorização
+```
+
+### `src/app.py`
+
+Responsável pela interface Streamlit, filtros territoriais, indicadores, visualizações e exportação dos resultados.
+
+> Os módulos auxiliares de `src/` complementam a organização do projeto e não alteram o fluxo utilizado pela aplicação Streamlit, que continua utilizando `app.py`, `predict.py` e o pipeline final serializado.
 
 ---
 
@@ -473,6 +553,8 @@ O Random Forest final foi avaliado utilizando validação cruzada estratificada 
 | ROC-AUC | 0,6290 | 0,0043 |
 
 Os baixos desvios entre os folds indicaram comportamento consistente em diferentes divisões dos dados.
+
+> A validação cruzada utiliza o threshold padrão do classificador. O threshold operacional de `0.52` foi definido posteriormente sobre o conjunto de validação.
 
 ---
 
@@ -763,18 +845,6 @@ models/modelo_final_random_forest.pkl
 
 Dessa forma, novas bases podem ser enviadas diretamente ao pipeline sem necessidade de executar manualmente as transformações utilizadas durante o treinamento.
 
-A lógica de inferência utilizada pela aplicação está centralizada em:
-
-```text
-src/predict.py
-```
-
-enquanto a interface e as visualizações estão implementadas em:
-
-```text
-src/app.py
-```
-
 ---
 
 # Tecnologias
@@ -864,8 +934,6 @@ Após a inicialização, acesse:
 http://localhost:8501
 ```
 
-A aplicação aceita arquivos em formato `CSV` ou `Parquet`.
-
 ### Arquivo para teste
 
 Um arquivo de exemplo já está disponível em:
@@ -874,7 +942,7 @@ Um arquivo de exemplo já está disponível em:
 data/app/dados_teste.parquet
 ```
 
-Esse arquivo corresponde ao conjunto de teste utilizado no projeto e pode ser carregado diretamente no Streamlit para validar o fluxo completo de inferência.
+Esse arquivo corresponde ao conjunto de teste utilizado no projeto e pode ser carregado diretamente na aplicação para validar o fluxo completo de inferência.
 
 ---
 
@@ -882,7 +950,7 @@ Esse arquivo corresponde ao conjunto de teste utilizado no projeto e pode ser ca
 
 O projeto também pode ser executado utilizando Docker.
 
-Na raiz do projeto, faça o build da imagem:
+Faça o build da imagem:
 
 ```bash
 docker build -t tech-challenge-fase3-literacy-ml .
@@ -988,6 +1056,21 @@ O material apresenta:
 
 ---
 
+# Versionamento
+
+O projeto utiliza **Git e GitHub** para controle de versão e organização das alterações.
+
+Durante a finalização foram utilizados:
+
+- histórico de commits;
+- branches para alterações isoladas;
+- Pull Requests para integração das mudanças;
+- revisão da estrutura e documentação antes do merge na branch principal.
+
+Essa organização permite maior rastreabilidade das mudanças realizadas ao longo do projeto.
+
+---
+
 # Limitações
 
 Algumas limitações devem ser consideradas:
@@ -1030,7 +1113,7 @@ O **Random Forest otimizado** foi selecionado como modelo final por apresentar o
 
 Com o threshold operacional de **0,52**, o modelo alcançou aproximadamente **78% de Recall para alunos não alfabetizados no conjunto de teste**, alinhando o comportamento da solução ao objetivo de priorização da classe de maior interesse.
 
-As análises com **Feature Importance, SHAP e Learning Curve** contribuíram para avaliar a interpretabilidade, estabilidade e comportamento do modelo.
+As análises com **Feature Importance, SHAP e Learning Curve** contribuíram para avaliar interpretabilidade, estabilidade e comportamento do modelo.
 
 As probabilidades foram transformadas em um **score de risco**, permitindo estruturar a análise em diferentes níveis:
 
@@ -1044,7 +1127,7 @@ Região
 
 A aplicação **Streamlit** transforma o pipeline de Machine Learning em uma solução interativa, permitindo enviar novas bases, gerar previsões, explorar territorialmente os resultados e exportar as classificações obtidas.
 
-Por fim, a utilização de **Docker** permite reproduzir a aplicação em um ambiente padronizado, reduzindo dependências relacionadas à configuração local.
+A utilização de **Docker** permite reproduzir a aplicação em um ambiente padronizado, enquanto a organização modular em `src/` separa responsabilidades de pré-processamento, modelagem, avaliação, visualização e inferência.
 
 Dessa forma, o projeto vai além do treinamento de modelos e conecta:
 
